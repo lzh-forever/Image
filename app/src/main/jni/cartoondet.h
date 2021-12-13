@@ -28,25 +28,20 @@ class CartoonDet
 public:
     CartoonDet();
 
-    int load(const char* modeltype,const float* mean_vals, const float* norm_vals, bool use_gpu = false);
+    int load(const char* modeltype,bool use_gpu = false);
 
-    int load(AAssetManager* mgr, const char* modeltype, const float* mean_vals, const float* norm_vals, bool use_gpu = false);
-
-    int detect(const cv::Mat& rgb,  float prob_threshold = 0.4f, float nms_threshold = 0.5f);
+    int load(AAssetManager* mgr, const char* modeltype,  bool use_gpu = false);
 
     int draw(cv::Mat& rgb);
 
 private:
 
-    void matting(cv::Mat &rgb, cv::Mat &cartoon);
+    void cartoonize(cv::Mat &rgb, cv::Mat &cartoon);
     ncnn::Net faceseg;
 
     int is_first;
     int h;
     int w;
-    float mean_vals[3];
-    float norm_vals[3];
-
 
     ncnn::UnlockedPoolAllocator blob_pool_allocator;
     ncnn::PoolAllocator workspace_pool_allocator;

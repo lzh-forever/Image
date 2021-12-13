@@ -31,7 +31,7 @@ CartoonDet::CartoonDet()
     is_first = 1;
 }
 
-int CartoonDet::load(const char* modeltype, const float* _mean_vals, const float* _norm_vals, bool use_gpu)
+int CartoonDet::load(const char* modeltype,bool use_gpu)
 {
     faceseg.clear();
     blob_pool_allocator.clear();
@@ -58,17 +58,10 @@ int CartoonDet::load(const char* modeltype, const float* _mean_vals, const float
     faceseg.load_param(parampath);
     faceseg.load_model(modelpath);
 
-    mean_vals[0] = _mean_vals[0];
-    mean_vals[1] = _mean_vals[1];
-    mean_vals[2] = _mean_vals[2];
-    norm_vals[0] = _norm_vals[0];
-    norm_vals[1] = _norm_vals[1];
-    norm_vals[2] = _norm_vals[2];
-
     return 0;
 }
 
-int CartoonDet::load(AAssetManager* mgr, const char* modeltype, const float* _mean_vals, const float* _norm_vals, bool use_gpu)
+int CartoonDet::load(AAssetManager* mgr, const char* modeltype,  bool use_gpu)
 {
     faceseg.clear();
     blob_pool_allocator.clear();
@@ -94,24 +87,12 @@ int CartoonDet::load(AAssetManager* mgr, const char* modeltype, const float* _me
     faceseg.load_param(mgr,parampath);
     faceseg.load_model(mgr,modelpath);
 
-    mean_vals[0] = _mean_vals[0];
-    mean_vals[1] = _mean_vals[1];
-    mean_vals[2] = _mean_vals[2];
-    norm_vals[0] = _norm_vals[0];
-    norm_vals[1] = _norm_vals[1];
-    norm_vals[2] = _norm_vals[2];
-
 
     return 0;
 }
 
-int CartoonDet::detect(const cv::Mat& rgb,  float prob_threshold, float nms_threshold)
-{
-    //TODO:add person detection
-    return 0;
-}
 
-void CartoonDet::matting(cv::Mat &rgb, cv::Mat &cartoon)
+void CartoonDet::cartoonize(cv::Mat &rgb, cv::Mat &cartoon)
 {
     ncnn::Extractor ex_face = faceseg.create_extractor();
     ncnn::Mat ncnn_in;
@@ -122,13 +103,13 @@ void CartoonDet::matting(cv::Mat &rgb, cv::Mat &cartoon)
     {
         if (h>w)
         {
-            w=720;
             h=(int)(720 * h / w);
+            w=720;
         }
         else
         {
-            w=(int)(720 * w / h);
             h=720;
+            w=(int)(720 * w / h);
         }
     }
     cv::Size ResSize=cv::Size((int)(w/8)*8,(int)(h/8)*8);
@@ -161,7 +142,7 @@ void CartoonDet::matting(cv::Mat &rgb, cv::Mat &cartoon)
         }
     }
 
-    cv_cartoon_pres.convertTo(cv_cartoon, CV_8UC3, 255.0, 0);
+    cv_cartoon_pres.convertTo(cv_cartoon, CV_8UC3, 1.0, 0);
     cv_cartoon.copyTo(cartoon);
     is_first = 0;
 }
@@ -169,7 +150,7 @@ void CartoonDet::matting(cv::Mat &rgb, cv::Mat &cartoon)
 int CartoonDet::draw(cv::Mat& rgb)
 {
     cv::Mat cartoon;
-    matting(rgb,cartoon);
+    cartoonize(rgb, cartoon);
     cv::resize(cartoon, rgb, rgb.size(), 0, 0, 1);
     return 0;
 }

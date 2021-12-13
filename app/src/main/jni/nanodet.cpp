@@ -119,11 +119,6 @@ int NanoDet::load(AAssetManager* mgr, const char* modeltype, int _target_size, c
     return 0;
 }
 
-int NanoDet::detect(const cv::Mat& rgb, std::vector<Object>& objects, float prob_threshold, float nms_threshold)
-{
-    //TODO:add person detection
-    return 0;
-}
 
 void NanoDet::matting(cv::Mat &rgb, cv::Mat &mask, cv::Mat &foreground)
 {
@@ -205,7 +200,7 @@ void NanoDet::matting(cv::Mat &rgb, cv::Mat &mask, cv::Mat &foreground)
     is_first = 0;
 }
 
-int NanoDet::draw(cv::Mat& rgb, const std::vector<Object>& objects)
+int NanoDet::draw(cv::Mat& rgb)
 {
     cv::Mat mask, fgr;
     matting(rgb,mask,fgr);
