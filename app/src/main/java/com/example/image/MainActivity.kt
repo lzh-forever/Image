@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.database.DatabaseUtils
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -17,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.image.databinding.ActivityMainBinding
 import com.example.image.util.getBitmapFromUri
+import com.example.image.util.saveBitmap
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collect
 
@@ -65,18 +67,26 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.button4.setOnClickListener {
-            binding.imageView.setImageBitmap(viewModel.bitmap)
+            viewModel.bitmap?.let { bitmap ->
+                binding.imageView.setImageBitmap(bitmap)
+                saveBitmap(bitmap,contentResolver)
+            }
+
         }
+
+
 
     }
 
     private val albumLauncher = registerForActivityResult(ActivityResultContracts.GetContent()){ uri->
-        Glide.with(this).load(uri).into(binding.imageView)
-        Log.d(tag,"$uri")
-        val cursor = contentResolver.query(uri,null,null,null,null)
-        DatabaseUtils.dumpCursor(cursor)
-        cursor?.close()
-        viewModel.uri=uri
+        uri?.let {
+            Glide.with(this).load(uri).into(binding.imageView)
+            Log.d(tag,"$uri")
+            val cursor = contentResolver.query(uri,null,null,null,null)
+            DatabaseUtils.dumpCursor(cursor)
+            cursor?.close()
+            viewModel.uri=uri }
+
     }
 
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){
@@ -90,11 +100,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkAndAskPermission(){
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
-            askPermission()
+            askPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+        if (Build.VERSION.SDK_INT<=28){
+            if(ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+                askPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
         }
     }
 
-    private fun askPermission(){
-        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+    private fun askPermission(permission : String){
+        requestPermissionLauncher.launch(permission)
     }
 }
