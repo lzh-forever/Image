@@ -16,7 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.image.databinding.ActivityMainBinding
-import com.example.image.util.getBitmapFromInputSteam
+import com.example.image.util.getBitmapFromUri
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collect
 
@@ -58,12 +58,14 @@ class MainActivity : AppCompatActivity() {
 
         binding.button3.setOnClickListener {
             viewModel.uri?.let { uri ->
-                contentResolver.openInputStream(uri)?.apply {
-                    viewModel.bitmap= getBitmapFromInputSteam(this)
-                    binding.imageView.setImageBitmap(viewModel.bitmap)
-                    close()
-                }
+                viewModel.bitmap = getBitmapFromUri(contentResolver,uri)
+                binding.imageView.setImageResource(R.drawable.ic_launcher_background)
+
             }
+        }
+
+        binding.button4.setOnClickListener {
+            binding.imageView.setImageBitmap(viewModel.bitmap)
         }
 
     }

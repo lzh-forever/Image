@@ -1,7 +1,9 @@
 package com.example.image.util
 
+import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -28,11 +30,13 @@ fun compress(bitmap: Bitmap, maxSize: Int = 1024): Bitmap {
 
 }
 
-fun getBitmapFromInputSteam( inputStream: InputStream, maxWidth: Int = 1080, maxHeight: Int =2340): Bitmap?{
+fun getBitmapFromUri( contentResolver: ContentResolver, uri: Uri, maxWidth: Int = 1080, maxHeight: Int =2340): Bitmap?{
     var size = BitmapFactory.Options().run {
         inJustDecodeBounds = true
         inPreferredConfig = Bitmap.Config.ARGB_8888
+        val inputStream = contentResolver.openInputStream(uri)
         BitmapFactory.decodeStream(inputStream, null , this)
+        inputStream?.close()
         val width = outWidth
         val height = outHeight
         max(width/maxWidth, height/maxHeight)
@@ -42,8 +46,9 @@ fun getBitmapFromInputSteam( inputStream: InputStream, maxWidth: Int = 1080, max
     BitmapFactory.Options().apply {
         inSampleSize = size
         inPreferredConfig = Bitmap.Config.ARGB_8888
+        val inputStream = contentResolver.openInputStream(uri)
         val bitmap = BitmapFactory.decodeStream(inputStream, null , this)
-
+        inputStream?.close()
         bitmap?.let {
             return compress(bitmap)
         }
