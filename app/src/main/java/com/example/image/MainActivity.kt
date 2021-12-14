@@ -18,7 +18,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.image.databinding.ActivityMainBinding
 import com.example.image.util.getBitmapFromUri
-import com.example.image.util.saveBitmap
+
+import com.example.image.util.saveBitmapInMedia
+import com.example.image.util.saveBitmapInternal
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collect
 
@@ -67,10 +69,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.button4.setOnClickListener {
-            viewModel.bitmap?.let { bitmap ->
-                binding.imageView.setImageBitmap(bitmap)
-                saveBitmap(bitmap,contentResolver)
-            }
+//            viewModel.bitmap?.let { bitmap ->
+//                binding.imageView.setImageBitmap(bitmap)
+////                saveBitmapInMedia(bitmap,contentResolver)
+//            }
+            saveBitmapInternal(this)
+
 
         }
 

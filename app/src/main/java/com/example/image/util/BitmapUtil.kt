@@ -1,13 +1,16 @@
 package com.example.image.util
 
 import android.content.ContentResolver
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import androidx.core.content.contentValuesOf
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.InputStream
 import kotlin.math.max
 
@@ -74,7 +77,7 @@ fun getBitmapFromUri(
 
 }
 
-fun saveBitmap(bitmap: Bitmap, contentResolver: ContentResolver) {
+fun saveBitmapInMedia(bitmap: Bitmap, contentResolver: ContentResolver) {
     val values = contentValuesOf(
         MediaStore.Images.Media.DISPLAY_NAME to "Image${System.currentTimeMillis()}.jpg",
         MediaStore.Images.Media.MIME_TYPE to "image/jpeg"
@@ -84,6 +87,16 @@ fun saveBitmap(bitmap: Bitmap, contentResolver: ContentResolver) {
             bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream)
             outputStream.close()
         }
+    }
+}
+
+fun saveBitmapInternal( context: Context){
+    val filename = "myfile"
+    val fileContents = "aaa"
+    val file = File(context.filesDir,filename)
+    Log.d("save","${file.absoluteFile}")
+    context.openFileOutput(filename, Context.MODE_PRIVATE).use {
+        it.write(fileContents.toByteArray())
     }
 }
 
