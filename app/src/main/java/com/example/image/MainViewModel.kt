@@ -15,6 +15,8 @@ class MainViewModel:ViewModel() {
 
     var bitmap:Bitmap? =null
 
+    var newBitmap: Bitmap? =null
+
     private val clicked = MutableStateFlow(false)
 
     val data = liveData {

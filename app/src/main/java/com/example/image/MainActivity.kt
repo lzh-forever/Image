@@ -27,11 +27,12 @@ import kotlinx.coroutines.flow.collect
 class MainActivity : AppCompatActivity() {
 
     private val tag = "MainActivity"
-
+    private val ncnncartoon =NcnnBodyseg()
     lateinit var viewModel:MainViewModel
     lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ncnncartoon.loadModel(assets,0,0)
         binding =ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         viewModel=ViewModelProvider(this).get(MainViewModel::class.java)
@@ -71,7 +72,10 @@ class MainActivity : AppCompatActivity() {
         binding.button4.setOnClickListener {
 //            viewModel.bitmap?.let { bitmap ->
 //                binding.imageView.setImageBitmap(bitmap)
-////                saveBitmapInMedia(bitmap,contentResolver)
+//                saveBitmapInMedia(bitmap,contentResolver)
+//                ncnncartoon.matting(bitmap)?.let {
+//                    saveBitmapInMedia(it,contentResolver)
+//                }
 //            }
             saveBitmapInternal(this)
 

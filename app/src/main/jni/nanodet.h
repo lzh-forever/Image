@@ -16,16 +16,8 @@
 #define NANODET_H
 
 #include <opencv2/core/core.hpp>
-
 #include <net.h>
 
-struct Object
-{
-    cv::Rect_<float> rect;
-    cv::Mat mask;
-    int label;
-    float prob;
-};
 
 class NanoDet
 {
@@ -36,9 +28,7 @@ public:
 
     int load(AAssetManager* mgr, const char* modeltype, int target_size, const float* mean_vals, const float* norm_vals, bool use_gpu = false);
 
-    int detect(const cv::Mat& rgb, std::vector<Object>& objects, float prob_threshold = 0.4f, float nms_threshold = 0.5f);
-
-    int draw(cv::Mat& rgb, const std::vector<Object>& objects);
+    int draw(cv::Mat& rgb);
 
 private:
 

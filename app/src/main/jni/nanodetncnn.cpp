@@ -28,7 +28,6 @@
 
 #include "nanodet.h"
 
-#include "ndkcamera.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -37,125 +36,21 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-static int draw_unsupported(cv::Mat& rgb)
-{
-    const char text[] = "unsupported";
-
-    int baseLine = 0;
-    cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 1.0, 1, &baseLine);
-
-    int y = (rgb.rows - label_size.height) / 2;
-    int x = (rgb.cols - label_size.width) / 2;
-
-    cv::rectangle(rgb, cv::Rect(cv::Point(x, y), cv::Size(label_size.width, label_size.height + baseLine)),
-                    cv::Scalar(255, 255, 255), -1);
-
-    cv::putText(rgb, text, cv::Point(x, y + label_size.height),
-                cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 0, 0));
-
-    return 0;
-}
-
-static int draw_fps(cv::Mat& rgb)
-{
-    // resolve moving average
-    float avg_fps = 0.f;
-    {
-        static double t0 = 0.f;
-        static float fps_history[10] = {0.f};
-
-        double t1 = ncnn::get_current_time();
-        if (t0 == 0.f)
-        {
-            t0 = t1;
-            return 0;
-        }
-
-        float fps = 1000.f / (t1 - t0);
-        t0 = t1;
-
-        for (int i = 9; i >= 1; i--)
-        {
-            fps_history[i] = fps_history[i - 1];
-        }
-        fps_history[0] = fps;
-
-        if (fps_history[9] == 0.f)
-        {
-            return 0;
-        }
-
-        for (int i = 0; i < 10; i++)
-        {
-            avg_fps += fps_history[i];
-        }
-        avg_fps /= 10.f;
-    }
-
-    char text[32];
-    sprintf(text, "FPS=%.2f", avg_fps);
-
-    int baseLine = 0;
-    cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-
-    int y = 0;
-    int x = rgb.cols - label_size.width;
-
-    cv::rectangle(rgb, cv::Rect(cv::Point(x, y), cv::Size(label_size.width, label_size.height + baseLine)),
-                    cv::Scalar(255, 255, 255), -1);
-
-    cv::putText(rgb, text, cv::Point(x, y + label_size.height),
-                cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0));
-
-    return 0;
-}
 
 static NanoDet* g_nanodet = 0;
 static ncnn::Mutex lock;
 
-class MyNdkCamera : public NdkCameraWindow
-{
-public:
-    virtual void on_image_render(cv::Mat& rgb) const;
-};
-
-void MyNdkCamera::on_image_render(cv::Mat& rgb) const
-{
-    // nanodet
-    {
-        ncnn::MutexLockGuard g(lock);
-
-        if (g_nanodet)
-        {
-            std::vector<Object> objects;
-            g_nanodet->detect(rgb, objects);
-
-            g_nanodet->draw(rgb, objects);
-        }
-        else
-        {
-            draw_unsupported(rgb);
-        }
-    }
-
-    draw_fps(rgb);
-}
-
-static MyNdkCamera* g_camera = 0;
 
 extern "C" {
 
-JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
-{
+JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "JNI_OnLoad");
 
-    g_camera = new MyNdkCamera;
 
     return JNI_VERSION_1_4;
 }
 
-JNIEXPORT void JNI_OnUnload(JavaVM* vm, void* reserved)
-{
+JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
     __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "JNI_OnUnload");
 
     {
@@ -165,104 +60,147 @@ JNIEXPORT void JNI_OnUnload(JavaVM* vm, void* reserved)
         g_nanodet = 0;
     }
 
-    delete g_camera;
-    g_camera = 0;
 }
 
 // public native boolean loadModel(AssetManager mgr, int modelid, int cpugpu);
-JNIEXPORT jboolean JNICALL Java_com_example_image_NcnnBodyseg_loadModel(JNIEnv* env, jobject thiz, jobject assetManager, jint modelid, jint cpugpu)
-{
-    if (modelid < 0 || modelid > 6 || cpugpu < 0 || cpugpu > 1)
-    {
+JNIEXPORT jboolean JNICALL
+Java_com_example_image_NcnnBodyseg_loadModel(JNIEnv *env, jobject thiz, jobject assetManager,
+                                             jint modelid, jint cpugpu) {
+    if (modelid < 0 || modelid > 6 || cpugpu < 0 || cpugpu > 1) {
         return JNI_FALSE;
     }
 
-    AAssetManager* mgr = AAssetManager_fromJava(env, assetManager);
+    AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
 
     __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "loadModel %p", mgr);
 
-    const char* modeltypes[] =
-    {
-        "rvm-512",
-        "rvm-640",
-    };
+    const char *modeltypes[] =
+            {
+                    "rvm-512",
+                    "rvm-640",
+            };
 
     const int target_sizes[] =
-    {
-        512,
-        640,
-    };
+            {
+                    512,
+                    640,
+            };
 
     const float mean_vals[][3] =
-    {
-        {123.675f, 116.28f,  103.53f},
-        {123.675f, 116.28f,  103.53f},
-    };
+            {
+                    {123.675f, 116.28f, 103.53f},
+                    {123.675f, 116.28f, 103.53f},
+            };
 
     const float norm_vals[][3] =
-    {
-        {0.01712475f, 0.0175f, 0.01742919f},
-        {0.01712475f, 0.0175f, 0.01742919f},
-    };
+            {
+                    {0.01712475f, 0.0175f, 0.01742919f},
+                    {0.01712475f, 0.0175f, 0.01742919f},
+            };
 
-    const char* modeltype = modeltypes[(int)modelid];
-    int target_size = target_sizes[(int)modelid];
-    bool use_gpu = (int)cpugpu == 1;
+    const char *modeltype = modeltypes[(int) modelid];
+    int target_size = target_sizes[(int) modelid];
+    bool use_gpu = (int) cpugpu == 1;
 
     // reload
     {
         ncnn::MutexLockGuard g(lock);
 
-        if (use_gpu && ncnn::get_gpu_count() == 0)
-        {
+        if (use_gpu && ncnn::get_gpu_count() == 0) {
             // no gpu
             delete g_nanodet;
             g_nanodet = 0;
-        }
-        else
-        {
+        } else {
             if (!g_nanodet)
                 g_nanodet = new NanoDet;
-            g_nanodet->load(mgr, modeltype, target_size, mean_vals[(int)modelid], norm_vals[(int)modelid], use_gpu);
+            g_nanodet->load(mgr, modeltype, target_size, mean_vals[(int) modelid],
+                            norm_vals[(int) modelid], use_gpu);
         }
     }
 
     return JNI_TRUE;
 }
 
-// public native boolean openCamera(int facing);
-JNIEXPORT jboolean JNICALL Java_com_example_image_NcnnBodyseg_openCamera(JNIEnv* env, jobject thiz, jint facing)
+JNIEXPORT jobject JNICALL
+Java_com_example_image_NcnnBodyseg_matting(JNIEnv *env, jobject thiz, jobject bitmap)
 {
-    if (facing < 0 || facing > 1)
-        return JNI_FALSE;
+    {
+        ncnn::MutexLockGuard g(lock);
+        if (g_nanodet) {
+            int *data = NULL;
+            AndroidBitmapInfo info = {0};
+            AndroidBitmap_getInfo(env, bitmap, &info);
+            AndroidBitmap_lockPixels(env, bitmap, (void **) &data);
+            // 检查图片格式
+            if (info.format == ANDROID_BITMAP_FORMAT_RGBA_8888) {
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "info format is RGBA");
+            } else if (info.format == ANDROID_BITMAP_FORMAT_RGB_565) {
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "info format is RGB");
+            } else {
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "Unknown Format");
+            }
+            cv::Mat test(info.height, info.width, CV_8UC4, (char *) data); // RGBA
+            cv::Mat img_bgr;
+            cv::cvtColor(test, img_bgr, cv::COLOR_RGBA2RGB);
+            g_nanodet->draw(img_bgr);
+            jclass java_bitmap_class = (jclass) env->FindClass("android/graphics/Bitmap");
+            jmethodID mid = env->GetMethodID(java_bitmap_class, "getConfig",
+                                             "()Landroid/graphics/Bitmap$Config;");
+            jobject bitmap_config = env->CallObjectMethod(bitmap, mid);
+            bool needPremultiplyAlpha = false;
+            cv::Mat &src = img_bgr;
+            {
+                jclass java_bitmap_class = (jclass) env->FindClass("android/graphics/Bitmap");
+                jmethodID mid = env->GetStaticMethodID(java_bitmap_class,
+                                                       "createBitmap",
+                                                       "(IILandroid/graphics/Bitmap$Config;)Landroid/graphics/Bitmap;");
 
-    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "openCamera %d", facing);
+                jobject bitmap = env->CallStaticObjectMethod(java_bitmap_class,
+                                                             mid, src.size().width,
+                                                             src.size().height, bitmap_config);
+                AndroidBitmapInfo info;
+                void *pixels = 0;
 
-    g_camera->open((int)facing);
-
-    return JNI_TRUE;
+                {
+                    CV_Assert(AndroidBitmap_getInfo(env, bitmap, &info) >= 0);
+                    CV_Assert(src.type() == CV_8UC1 || src.type() == CV_8UC3 ||
+                              src.type() == CV_8UC4);
+                    CV_Assert(AndroidBitmap_lockPixels(env, bitmap, &pixels) >= 0);
+                    CV_Assert(pixels);
+                    if (info.format == ANDROID_BITMAP_FORMAT_RGBA_8888) {
+                        cv::Mat tmp(info.height, info.width, CV_8UC4, pixels);
+                        if (src.type() == CV_8UC1) {
+                            cvtColor(src, tmp, cv::COLOR_GRAY2RGBA);
+                        } else if (src.type() == CV_8UC3) {
+                            cvtColor(src, tmp, cv::COLOR_RGB2BGRA);
+                            cvtColor(tmp, tmp, cv::COLOR_BGRA2RGBA);
+                        } else if (src.type() == CV_8UC4) {
+                            if (needPremultiplyAlpha) {
+                                cvtColor(src, tmp, cv::COLOR_RGBA2mRGBA);
+                            } else {
+                                src.copyTo(tmp);
+                            }
+                        }
+                    } else {
+                        // info.format == ANDROID_BITMAP_FORMAT_RGB_565
+                        cv::Mat tmp(info.height, info.width, CV_8UC2, pixels);
+                        if (src.type() == CV_8UC1) {
+                            cvtColor(src, tmp, cv::COLOR_GRAY2BGR565);
+                        } else if (src.type() == CV_8UC3) {
+                            cvtColor(src, tmp, cv::COLOR_RGB2BGR565);
+                        } else if (src.type() == CV_8UC4) {
+                            cvtColor(src, tmp, cv::COLOR_RGBA2BGR565);
+                        }
+                    }
+                    AndroidBitmap_unlockPixels(env, bitmap);
+                    return bitmap;
+                }
+            }
+        } else {
+            __android_log_print(ANDROID_LOG_ERROR, "ncnn",
+                                "g_nanodet no initialise please load model first");
+            return nullptr;
+        }
+    }
 }
-
-// public native boolean closeCamera();
-JNIEXPORT jboolean JNICALL Java_com_example_image_NcnnBodyseg_closeCamera(JNIEnv* env, jobject thiz)
-{
-    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "closeCamera");
-
-    g_camera->close();
-
-    return JNI_TRUE;
-}
-
-// public native boolean setOutputWindow(Surface surface);
-JNIEXPORT jboolean JNICALL Java_com_example_image_NcnnBodyseg_setOutputWindow(JNIEnv* env, jobject thiz, jobject surface)
-{
-    ANativeWindow* win = ANativeWindow_fromSurface(env, surface);
-
-    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "setOutputWindow %p", win);
-
-    g_camera->set_window(win);
-
-    return JNI_TRUE;
-}
-
 }
