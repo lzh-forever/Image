@@ -1,8 +1,11 @@
-package com.example.image
+package com.example.image.ui
 
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.*
+import androidx.paging.cachedIn
+import com.example.image.Repository
+import com.example.image.model.Photo
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -15,7 +18,11 @@ class MainViewModel:ViewModel() {
 
     var bitmap:Bitmap? =null
 
-    var newBitmap: Bitmap? =null
+    fun addPhoto(photoName:String){
+        viewModelScope.launch {
+            Repository.addPhoto(Photo(photoName))
+        }
+    }
 
     private val clicked = MutableStateFlow(false)
 

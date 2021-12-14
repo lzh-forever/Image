@@ -1,34 +1,32 @@
-package com.example.image
+package com.example.image.ui
 
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.DatabaseUtils
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.example.image.NcnnBodyseg
+import com.example.image.R
 import com.example.image.databinding.ActivityMainBinding
 import com.example.image.util.getBitmapFromUri
 
 import com.example.image.util.saveBitmapInMedia
 import com.example.image.util.saveBitmapInternal
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.flow.collect
 
 class MainActivity : AppCompatActivity() {
 
     private val tag = "MainActivity"
-    private val ncnncartoon =NcnnBodyseg()
-    lateinit var viewModel:MainViewModel
+    private val ncnncartoon = NcnnBodyseg()
+    lateinit var viewModel: MainViewModel
     lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +35,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         viewModel=ViewModelProvider(this).get(MainViewModel::class.java)
         checkAndAskPermission()
+
 
         viewModel.snackbar.observe(this){ text->
             text?.let {
@@ -50,14 +49,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.button2.setOnClickListener {
-            viewModel.uri?.let { uri ->
-                val intent = Intent().apply {
-                    action =Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_STREAM,uri)
-                    type = "image/*"
-                }
-                startActivity(Intent.createChooser(intent, "share photo"))
-            }
+//            viewModel.uri?.let { uri ->
+//                val intent = Intent().apply {
+//                    action =Intent.ACTION_SEND
+//                    putExtra(Intent.EXTRA_STREAM,uri)
+//                    type = "image/*"
+//                }
+//                startActivity(Intent.createChooser(intent, "share photo"))
+//            }
+
+            val intent = Intent(this,SecondActivity::class.java)
+            startActivity(intent)
 
         }
 
@@ -72,14 +74,12 @@ class MainActivity : AppCompatActivity() {
         binding.button4.setOnClickListener {
 //            viewModel.bitmap?.let { bitmap ->
 //                binding.imageView.setImageBitmap(bitmap)
-//                saveBitmapInMedia(bitmap,contentResolver)
 //                ncnncartoon.matting(bitmap)?.let {
 //                    saveBitmapInMedia(it,contentResolver)
+//                    saveBitmapInternal(it,this)
 //                }
 //            }
-            saveBitmapInternal(this)
-
-
+            viewModel.addPhoto(System.currentTimeMillis().toString())
         }
 
 

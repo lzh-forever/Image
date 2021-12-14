@@ -8,10 +8,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import androidx.core.content.contentValuesOf
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.InputStream
+import java.io.*
 import kotlin.math.max
 
 fun compress(bitmap: Bitmap, maxSize: Int = 1024): Bitmap {
@@ -90,13 +87,12 @@ fun saveBitmapInMedia(bitmap: Bitmap, contentResolver: ContentResolver) {
     }
 }
 
-fun saveBitmapInternal( context: Context){
-    val filename = "myfile"
-    val fileContents = "aaa"
-    val file = File(context.filesDir,filename)
-    Log.d("save","${file.absoluteFile}")
+fun saveBitmapInternal(bitmap: Bitmap, context: Context){
+    val filename = "Image${System.currentTimeMillis()}.jpg"
+    val outputStream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream)
     context.openFileOutput(filename, Context.MODE_PRIVATE).use {
-        it.write(fileContents.toByteArray())
+        it.write(outputStream.toByteArray())
     }
 }
 
