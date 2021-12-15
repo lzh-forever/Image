@@ -1,33 +1,35 @@
-package com.example.image
+package com.example.image.ui
 
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.DatabaseUtils
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.example.image.NcnnBodyseg
+import com.example.image.R
 import com.example.image.databinding.ActivityMainBinding
 import com.example.image.util.getBitmapFromUri
-import com.example.image.util.saveBitmap
+
+import com.example.image.util.saveBitmapInMedia
+import com.example.image.util.saveBitmapInternal
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.flow.collect
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
     private val tag = "MainActivity"
-    private val ncnncartoon =NcnnBodyseg()
-    lateinit var viewModel:MainViewModel
+    private val ncnncartoon = NcnnBodyseg()
+    lateinit var viewModel: MainViewModel
     lateinit var binding: ActivityMainBinding
+    var count = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ncnncartoon.loadModel(assets,0,0)
@@ -35,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         viewModel=ViewModelProvider(this).get(MainViewModel::class.java)
         checkAndAskPermission()
+        Glide.with(this).load(File(filesDir,"Image1639469745070.jpg")).into(binding.imageView)
 
         viewModel.snackbar.observe(this){ text->
             text?.let {
@@ -57,25 +60,34 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent.createChooser(intent, "share photo"))
             }
 
+
+
         }
 
         binding.button3.setOnClickListener {
             viewModel.uri?.let { uri ->
                 viewModel.bitmap = getBitmapFromUri(contentResolver,uri)
-                binding.imageView.setImageResource(R.drawable.ic_launcher_background)
+                viewModel.bitmap?.let {
+                    val name = saveBitmapInternal(it,this)
+                    val content = "content  ${count++}"
+                    viewModel.addPhoto(name,content)
+                }
 
+//                binding.imageView.setImageResource(R.drawable.ic_launcher_background)
             }
         }
 
         binding.button4.setOnClickListener {
-            viewModel.bitmap?.let { bitmap ->
-                binding.imageView.setImageBitmap(bitmap)
-                ncnncartoon.matting(bitmap)?.let {
-                    saveBitmap(it,contentResolver)
-                }
+//            viewModel.bitmap?.let { bitmap ->
+//                binding.imageView.setImageBitmap(bitmap)
+//                ncnncartoon.matting(bitmap)?.let {
+//                    saveBitmapInMedia(it,contentResolver)
+//                    saveBitmapInternal(it,this)
+//                }
+//            }
 
-            }
-
+            val intent = Intent(this,SecondActivity::class.java)
+            startActivity(intent)
         }
 
 
