@@ -214,9 +214,9 @@ int NanoDet::draw(cv::Mat& rgb)
         {
             uchar data = alpha.at<uchar>(i, j);
             float alpha = (float)data / 255;
-            rgb.at < cv::Vec3b>(i, j)[0] = fgr.at < cv::Vec3b>(i, j)[0] * alpha + (1 - alpha) * 120;
+            rgb.at < cv::Vec3b>(i, j)[0] = fgr.at < cv::Vec3b>(i, j)[0] * alpha + (1 - alpha) * 255;
             rgb.at < cv::Vec3b>(i, j)[1] = fgr.at < cv::Vec3b>(i, j)[1] * alpha + (1 - alpha) * 255;
-            rgb.at < cv::Vec3b>(i, j)[2] = fgr.at < cv::Vec3b>(i, j)[2] * alpha + (1 - alpha) * 155;
+            rgb.at < cv::Vec3b>(i, j)[2] = fgr.at < cv::Vec3b>(i, j)[2] * alpha + (1 - alpha) * 255;
         }
     }
     return 0;
