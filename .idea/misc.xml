@@ -3,9 +3,20 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/ic_baseline_add_a_photo_24.xml" value="0.3671875" />
+        <entry key="app/src/main/res/drawable/ic_baseline_favorite_border_24.xml" value="0.3671875" />
+        <entry key="app/src/main/res/drawable/ic_baseline_home_24.xml" value="0.3671875" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_main2.xml" value="0.32382246376811596" />
         <entry key="app/src/main/res/layout/activity_second.xml" value="0.35104166666666664" />
+        <entry key="app/src/main/res/layout/fragment_blank.xml" value="0.3179347826086957" />
+        <entry key="app/src/main/res/layout/fragment_display.xml" value="0.3179347826086957" />
+        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.19479166666666667" />
+        <entry key="app/src/main/res/layout/fragment_process.xml" value="0.3179347826086957" />
         <entry key="app/src/main/res/layout/item.xml" value="0.35104166666666664" />
+        <entry key="app/src/main/res/layout/new_item.xml" value="0.32971014492753625" />
+        <entry key="app/src/main/res/layout/photo_item.xml" value="0.19479166666666667" />
+        <entry key="app/src/main/res/menu/bottom_nav.xml" value="0.35104166666666664" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.3671875" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.3671875" />
       </map>

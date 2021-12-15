@@ -1,7 +1,8 @@
-package com.example.image.ui
+package com.example.image.ui.display
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -11,7 +12,9 @@ import com.example.image.databinding.ItemBinding
 import com.example.image.model.Record
 import java.io.File
 
-class PhotoAdapter(private val context:Context) : PagingDataAdapter<Record, PhotoAdapter.ViewHolder>(COMPARATOR) {
+class PhotoAdapter(private val context:Context) : PagingDataAdapter<Record, PhotoAdapter.ViewHolder>(
+    COMPARATOR
+) {
 
     companion object {
         private val COMPARATOR = object : DiffUtil.ItemCallback<Record>() {
@@ -26,6 +29,7 @@ class PhotoAdapter(private val context:Context) : PagingDataAdapter<Record, Phot
         }
     }
 
+    private val map = HashMap<Int,Boolean>()
 
     class ViewHolder(binding: ItemBinding) : RecyclerView.ViewHolder(binding.root) {
         val content = binding.contentTextView
@@ -46,6 +50,9 @@ class PhotoAdapter(private val context:Context) : PagingDataAdapter<Record, Phot
             holder.day.text = record.day.toString()
             record.photoName?.let {
                 Glide.with(context).load(getCachedBitmap(it)).into(holder.photo)
+            }
+            if (position==2){
+                holder.photo.visibility = View.GONE
             }
 
         }
