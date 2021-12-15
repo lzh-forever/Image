@@ -87,12 +87,12 @@ fun saveBitmapInMedia(bitmap: Bitmap, contentResolver: ContentResolver) {
     }
 }
 
-fun saveBitmapInternal(bitmap: Bitmap, context: Context){
+fun saveBitmapInternal(bitmap: Bitmap, context: Context):String{
     val filename = "Image${System.currentTimeMillis()}.jpg"
     val outputStream = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream)
     context.openFileOutput(filename, Context.MODE_PRIVATE).use {
         it.write(outputStream.toByteArray())
     }
+    return filename
 }
-

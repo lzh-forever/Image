@@ -1,23 +1,25 @@
 package com.example.image.ui
 
+import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.image.databinding.ItemBinding
-import com.example.image.model.Photo
+import com.example.image.model.Record
+import java.io.File
 
-class PhotoAdapter : PagingDataAdapter<Photo, PhotoAdapter.ViewHolder>(COMPARATOR) {
+class PhotoAdapter(private val context:Context) : PagingDataAdapter<Record, PhotoAdapter.ViewHolder>(COMPARATOR) {
 
     companion object {
-        private val COMPARATOR = object : DiffUtil.ItemCallback<Photo>() {
-            override fun areItemsTheSame(oldItem: Photo, newItem: Photo): Boolean {
+        private val COMPARATOR = object : DiffUtil.ItemCallback<Record>() {
+            override fun areItemsTheSame(oldItem: Record, newItem: Record): Boolean {
                 return oldItem.id == newItem.id
             }
 
-            override fun areContentsTheSame(oldItem: Photo, newItem: Photo): Boolean {
+            override fun areContentsTheSame(oldItem: Record, newItem: Record): Boolean {
                 return oldItem == newItem
             }
 
@@ -26,7 +28,10 @@ class PhotoAdapter : PagingDataAdapter<Photo, PhotoAdapter.ViewHolder>(COMPARATO
 
 
     class ViewHolder(binding: ItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        val textView = binding.itemTextView
+        val content = binding.contentTextView
+        val month = binding.monthTextView
+        val day =binding.dayTextView
+        val photo = binding.photoImageView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,11 +40,20 @@ class PhotoAdapter : PagingDataAdapter<Photo, PhotoAdapter.ViewHolder>(COMPARATO
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        getItem(position)?.let { photo ->
-            holder.textView.text = photo.name
+        getItem(position)?.let { record ->
+            holder.content.text = record.content
+            holder.month.text = record.month.toString()
+            holder.day.text = record.day.toString()
+            record.photoName?.let {
+                Glide.with(context).load(getCachedBitmap(it)).into(holder.photo)
+            }
+
         }
 
     }
+
+
+    private fun getCachedBitmap(name:String) = File(context.filesDir,name)
 
 
 }

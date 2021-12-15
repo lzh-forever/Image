@@ -21,6 +21,7 @@ import com.example.image.util.getBitmapFromUri
 import com.example.image.util.saveBitmapInMedia
 import com.example.image.util.saveBitmapInternal
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     private val ncnncartoon = NcnnBodyseg()
     lateinit var viewModel: MainViewModel
     lateinit var binding: ActivityMainBinding
+    var count = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ncnncartoon.loadModel(assets,0,0)
@@ -35,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         viewModel=ViewModelProvider(this).get(MainViewModel::class.java)
         checkAndAskPermission()
-
+        Glide.with(this).load(File(filesDir,"Image1639469745070.jpg")).into(binding.imageView)
 
         viewModel.snackbar.observe(this){ text->
             text?.let {
@@ -49,25 +51,29 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.button2.setOnClickListener {
-//            viewModel.uri?.let { uri ->
-//                val intent = Intent().apply {
-//                    action =Intent.ACTION_SEND
-//                    putExtra(Intent.EXTRA_STREAM,uri)
-//                    type = "image/*"
-//                }
-//                startActivity(Intent.createChooser(intent, "share photo"))
-//            }
+            viewModel.uri?.let { uri ->
+                val intent = Intent().apply {
+                    action =Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_STREAM,uri)
+                    type = "image/*"
+                }
+                startActivity(Intent.createChooser(intent, "share photo"))
+            }
 
-            val intent = Intent(this,SecondActivity::class.java)
-            startActivity(intent)
+
 
         }
 
         binding.button3.setOnClickListener {
             viewModel.uri?.let { uri ->
                 viewModel.bitmap = getBitmapFromUri(contentResolver,uri)
-                binding.imageView.setImageResource(R.drawable.ic_launcher_background)
+                viewModel.bitmap?.let {
+                    val name = saveBitmapInternal(it,this)
+                    val content = "content  ${count++}"
+                    viewModel.addPhoto(name,content)
+                }
 
+//                binding.imageView.setImageResource(R.drawable.ic_launcher_background)
             }
         }
 
@@ -79,7 +85,9 @@ class MainActivity : AppCompatActivity() {
 //                    saveBitmapInternal(it,this)
 //                }
 //            }
-            viewModel.addPhoto(System.currentTimeMillis().toString())
+
+            val intent = Intent(this,SecondActivity::class.java)
+            startActivity(intent)
         }
 
 

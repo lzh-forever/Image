@@ -4,11 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.image.model.Photo
+import com.example.image.model.Record
 
-@Database(version = 1, entities = [Photo::class])
+@Database(version = 1, entities = [Record::class])
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun photoDao(): PhotoDao
+    abstract fun recordDao(): RecordDao
 
     companion object {
 

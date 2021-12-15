@@ -13,13 +13,14 @@ class SecondActivity : AppCompatActivity() {
 
     lateinit var binding: ActivitySecondBinding
     lateinit var viewModel: SecondViewModel
-    val photoAdapter = PhotoAdapter()
+    lateinit var photoAdapter: PhotoAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySecondBinding.inflate(layoutInflater)
         setContentView(binding.root)
         viewModel = ViewModelProvider(this).get(SecondViewModel::class.java)
+        photoAdapter = PhotoAdapter(this)
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(this@SecondActivity)
             adapter = photoAdapter
