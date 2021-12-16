@@ -17,7 +17,7 @@
         tools:layout="@layout/fragment_display" />
     <fragment
         android:id="@+id/processFragment"
-        android:name="com.example.image.ui.ProcessFragment"
+        android:name="com.example.image.ui.process.ProcessFragment"
         android:label="fragment_process"
         tools:layout="@layout/fragment_process" />
 </navigation>

@@ -19,8 +19,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Image">
         <activity
+            android:name=".ui.detail.AddActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.MainActivity2"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,9 +35,7 @@
             android:exported="false" />
         <activity
             android:name=".ui.MainActivity"
-            android:exported="true">
-
-        </activity>
+            android:exported="true"></activity>
     </application>
 
 </manifest>

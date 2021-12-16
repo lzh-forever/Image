@@ -8,7 +8,5 @@ data class Record(var content: String="") {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
     var photoName: String?=null
-    var year: Int = 1970
-    var month: Int = 1
-    var day: Int = 1
+    var date:String = ""
 }

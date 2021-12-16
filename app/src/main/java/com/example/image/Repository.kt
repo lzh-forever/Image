@@ -17,19 +17,17 @@ object Repository {
 
 //    suspend fun getTest() = Network.test()
 
-    suspend fun addRecord(photoName:String, content:String ) {
+    suspend fun addRecord(photoName:String?, content:String,date:String ) {
         val record = Record()
         record.photoName = photoName
         record.content = content
-        Calendar.getInstance().apply {
-            record.year = get(Calendar.YEAR)
-            record.month = get(Calendar.MONTH) + 1
-            record.day = get(Calendar.DAY_OF_MONTH)
-        }
+        record.date = date
         recordDao.insertRecord(record)
     }
 
     suspend fun updataRecord(record: Record) = recordDao.updateRecord(record)
+
+    suspend fun deleteRecord(id:Long) = recordDao.deleteRecord(id)
 
 
     fun getPagingData(): Flow<PagingData<Record>> {

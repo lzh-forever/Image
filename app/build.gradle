@@ -77,9 +77,9 @@ dependencies {
     implementation("androidx.room:room-ktx:2.4.0-rc01")
     implementation("androidx.room:room-paging:2.4.0-rc01")
     implementation("androidx.paging:paging-runtime-ktx:3.1.0")
-//  navigation
-    implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")
-    implementation("androidx.navigation:navigation-ui-ktx:2.3.5")
+//  navigation beta02 can saveState
+    implementation("androidx.navigation:navigation-fragment-ktx:2.4.0-beta02")
+    implementation("androidx.navigation:navigation-ui-ktx:2.4.0-beta02")
 //    viewpager2
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 

@@ -16,7 +16,7 @@ import kotlin.concurrent.timerTask
 
 
 class HomeFragment : Fragment() {
-    var curPosition = 1
+
     lateinit var binding: FragmentHomeBinding
     lateinit var viewmodel: HomeViewModel
     lateinit var adapter: ViewPagerAdapter
@@ -32,10 +32,10 @@ class HomeFragment : Fragment() {
     )
     var isScrolling = false
     val handler = Handler(Looper.getMainLooper())
-    val interval = 4000L
+    val interval = 7000L
     val loop = Runnable {
         if(!isScrolling){
-            binding.viewPager.setCurrentItem(++curPosition)
+            binding.viewPager.setCurrentItem(++viewmodel.curPosition)
         }
     }
 
@@ -49,15 +49,15 @@ class HomeFragment : Fragment() {
         viewmodel = ViewModelProvider(this).get(HomeViewModel::class.java)
         adapter = ViewPagerAdapter(list, requireContext())
         binding.viewPager.adapter = adapter
-
-        binding.viewPager.setCurrentItem(curPosition, false)
+        Log.d("home","create view")
+        binding.viewPager.setCurrentItem(viewmodel.curPosition, false)
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
                 if (state == ViewPager2.SCROLL_STATE_IDLE) {
                     isScrolling = false
-                    if (curPosition == 0) {
+                    if (viewmodel.curPosition == 0) {
                         binding.viewPager.setCurrentItem(list.lastIndex - 1, false)
-                    } else if (curPosition == list.lastIndex) {
+                    } else if (viewmodel.curPosition == list.lastIndex) {
                         binding.viewPager.setCurrentItem(1, false)
                     }
                     handler.postDelayed(loop,interval)
@@ -79,7 +79,7 @@ class HomeFragment : Fragment() {
             }
 
             override fun onPageSelected(position: Int) {
-                curPosition = position
+                viewmodel.curPosition = position
                 Log.d("home", "$position")
             }
         }
@@ -93,6 +93,18 @@ class HomeFragment : Fragment() {
 
     override fun onDestroyView() {
         handler.removeCallbacks(loop)
+        Log.d("home","destroy view")
         super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        Log.d("home","destroy")
+
+        super.onDestroy()
+    }
+
+    override fun onDetach() {
+        Log.d("home","detach")
+        super.onDetach()
     }
 }

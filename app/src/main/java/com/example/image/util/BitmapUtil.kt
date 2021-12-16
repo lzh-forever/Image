@@ -74,17 +74,19 @@ fun getBitmapFromUri(
 
 }
 
-fun saveBitmapInMedia(bitmap: Bitmap, contentResolver: ContentResolver) {
+fun saveBitmapInMedia(bitmap: Bitmap, contentResolver: ContentResolver):Uri? {
     val values = contentValuesOf(
         MediaStore.Images.Media.DISPLAY_NAME to "Image${System.currentTimeMillis()}.jpg",
         MediaStore.Images.Media.MIME_TYPE to "image/jpeg"
     )
-    contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)?.let { uri ->
+    val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+    uri?.let { uri ->
         contentResolver.openOutputStream(uri)?.let { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream)
             outputStream.close()
         }
-    }
+        return uri
+    } ?: return null
 }
 
 fun saveBitmapInternal(bitmap: Bitmap, context: Context):String{
