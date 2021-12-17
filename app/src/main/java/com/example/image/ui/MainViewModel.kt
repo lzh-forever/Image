@@ -18,9 +18,9 @@ class MainViewModel:ViewModel() {
     var bitmap:Bitmap? =null
 
     fun addPhoto(photoName:String,content:String){
-        viewModelScope.launch {
-            Repository.addRecord(photoName, content)
-        }
+//        viewModelScope.launch {
+//            Repository.addRecord(photoName, content)
+//        }
     }
 
     private val clicked = MutableStateFlow(false)

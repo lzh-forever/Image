@@ -1,10 +1,7 @@
 package com.example.image.room
 
 import androidx.paging.PagingSource
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.example.image.model.Record
 
 @Dao
@@ -18,9 +15,12 @@ interface RecordDao {
     @Update
     suspend fun updateRecord(record: Record)
 
-    @Query("SELECT * FROM record")
+    @Query("SELECT * FROM record order by date desc")
     fun getRecords(): PagingSource<Int, Record>
 
     @Query("DELETE FROM record")
     suspend fun deleteAll()
+
+    @Query("delete from record where id==:id")
+    suspend fun deleteRecord(id: Long)
 }

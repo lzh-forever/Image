@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.image.databinding.ActivitySecondBinding
+import com.example.image.ui.display.PhotoAdapter
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
