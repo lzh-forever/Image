@@ -27,7 +27,7 @@
 #include <benchmark.h>
 
 #include "nanodet.h"
-
+#include "cartoondet.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -38,8 +38,7 @@
 
 
 static NanoDet* g_nanodet = 0;
-static ncnn::Mutex lock;
-
+static CartoonDet* g_cartoondet = 0;
 
 extern "C" {
 
@@ -54,18 +53,19 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
     __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "JNI_OnUnload");
 
     {
-        ncnn::MutexLockGuard g(lock);
 
         delete g_nanodet;
         g_nanodet = 0;
+        delete g_cartoondet;
+        g_cartoondet = 0;
     }
 
 }
 
 // public native boolean loadModel(AssetManager mgr, int modelid, int cpugpu);
 JNIEXPORT jboolean JNICALL
-Java_com_example_image_NcnnBodyseg_loadModel(JNIEnv *env, jobject thiz, jobject assetManager,
-                                             jint modelid, jint cpugpu) {
+Java_com_example_image_NcnnUtils_loadModel1(JNIEnv *env, jobject thiz, jobject assetManager,
+                                            jint modelid, jint cpugpu) {
     if (modelid < 0 || modelid > 6 || cpugpu < 0 || cpugpu > 1) {
         return JNI_FALSE;
     }
@@ -104,7 +104,6 @@ Java_com_example_image_NcnnBodyseg_loadModel(JNIEnv *env, jobject thiz, jobject 
 
     // reload
     {
-        ncnn::MutexLockGuard g(lock);
 
         if (use_gpu && ncnn::get_gpu_count() == 0) {
             // no gpu
@@ -120,12 +119,49 @@ Java_com_example_image_NcnnBodyseg_loadModel(JNIEnv *env, jobject thiz, jobject 
 
     return JNI_TRUE;
 }
+JNIEXPORT jboolean JNICALL
+Java_com_example_image_NcnnUtils_loadModel2(JNIEnv *env, jobject thiz, jobject assetManager, jint modelid,
+                                            jint cpugpu) {
+    if (modelid < 0 || modelid > 0 || cpugpu < 0 || cpugpu > 1)
+    {
+        return JNI_FALSE;
+    }
 
+    AAssetManager* mgr = AAssetManager_fromJava(env, assetManager);
+
+    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "loadModel %p", mgr);
+
+    const char* modeltypes[] =
+            {
+                    "cartoon-sim",
+            };
+
+    const char* modeltype = modeltypes[(int)modelid];
+    bool use_gpu = (int)cpugpu == 1;
+
+    // reload
+    {
+
+        if (use_gpu && ncnn::get_gpu_count() == 0)
+        {
+            // no gpu
+            delete g_cartoondet;
+            g_cartoondet = 0;
+        }
+        else
+        {
+            if (!g_cartoondet)
+                g_cartoondet = new CartoonDet;
+            g_cartoondet->load(mgr, modeltype,  use_gpu);
+        }
+    }
+
+    return JNI_TRUE;
+}
 JNIEXPORT jobject JNICALL
-Java_com_example_image_NcnnBodyseg_matting(JNIEnv *env, jobject thiz, jobject bitmap)
+Java_com_example_image_NcnnUtils_matting(JNIEnv *env, jobject thiz, jobject bitmap)
 {
     {
-        ncnn::MutexLockGuard g(lock);
         if (g_nanodet) {
             int *data = NULL;
             AndroidBitmapInfo info = {0};
@@ -203,4 +239,89 @@ Java_com_example_image_NcnnBodyseg_matting(JNIEnv *env, jobject thiz, jobject bi
         }
     }
 }
+
+JNIEXPORT jobject JNICALL
+Java_com_example_image_NcnnUtils_cartoon(JNIEnv *env, jobject thiz, jobject bitmap) {
+    {
+        if (g_cartoondet)
+        {
+            int *data = NULL;
+            AndroidBitmapInfo info = {0};
+            AndroidBitmap_getInfo(env, bitmap, &info);
+            AndroidBitmap_lockPixels(env, bitmap, (void **) &data);
+            // 检查图片格式
+            if(info.format == ANDROID_BITMAP_FORMAT_RGBA_8888)
+            {
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "info format is RGBA");
+            } else if(info.format == ANDROID_BITMAP_FORMAT_RGB_565)
+            {
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "info format is RGB");
+            }else{
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "Unknown Format");
+            }
+            cv::Mat test(info.height, info.width, CV_8UC4, (char*)data); // RGBA
+            cv::Mat img_bgr;
+            cv::cvtColor(test, img_bgr, cv::COLOR_RGBA2RGB);
+            g_cartoondet->draw(img_bgr);
+            jclass java_bitmap_class = (jclass)env->FindClass("android/graphics/Bitmap");
+            jmethodID mid = env->GetMethodID(java_bitmap_class, "getConfig", "()Landroid/graphics/Bitmap$Config;");
+            jobject bitmap_config = env->CallObjectMethod(bitmap, mid);
+            bool needPremultiplyAlpha= false;
+            cv::Mat& src=img_bgr;
+            {
+                jclass java_bitmap_class = (jclass)env->FindClass("android/graphics/Bitmap");
+                jmethodID mid = env->GetStaticMethodID(java_bitmap_class,
+                                                       "createBitmap", "(IILandroid/graphics/Bitmap$Config;)Landroid/graphics/Bitmap;");
+
+                jobject bitmap = env->CallStaticObjectMethod(java_bitmap_class,
+                                                             mid, src.size().width, src.size().height, bitmap_config);
+                AndroidBitmapInfo  info;
+                void*              pixels = 0;
+
+                {
+                    CV_Assert(AndroidBitmap_getInfo(env, bitmap, &info) >= 0);
+                    CV_Assert(src.type() == CV_8UC1 || src.type() == CV_8UC3 || src.type() == CV_8UC4);
+                    CV_Assert(AndroidBitmap_lockPixels(env, bitmap, &pixels) >= 0);
+                    CV_Assert(pixels);
+                    if(info.format == ANDROID_BITMAP_FORMAT_RGBA_8888){
+                        cv::Mat tmp(info.height, info.width, CV_8UC4, pixels);
+                        if(src.type() == CV_8UC1){
+                            cvtColor(src, tmp, cv::COLOR_GRAY2RGBA);
+                        }
+                        else if(src.type() == CV_8UC3) {
+                            cvtColor(src, tmp, cv::COLOR_RGB2BGRA);
+                            cvtColor(tmp, tmp, cv::COLOR_BGRA2RGBA);
+                        }
+                        else if(src.type() == CV_8UC4){
+                            if(needPremultiplyAlpha){
+                                cvtColor(src, tmp, cv::COLOR_RGBA2mRGBA);
+                            }else{
+                                src.copyTo(tmp);
+                            }
+                        }
+                    }else{
+                        // info.format == ANDROID_BITMAP_FORMAT_RGB_565
+                        cv::Mat tmp(info.height, info.width, CV_8UC2, pixels);
+                        if(src.type() == CV_8UC1){
+                            cvtColor(src, tmp, cv::COLOR_GRAY2BGR565);
+                        }else if(src.type() == CV_8UC3){
+                            cvtColor(src, tmp, cv::COLOR_RGB2BGR565);
+                        }else if(src.type() == CV_8UC4){
+                            cvtColor(src, tmp, cv::COLOR_RGBA2BGR565);
+                        }
+                    }
+                    AndroidBitmap_unlockPixels(env, bitmap);
+                    return bitmap;
+                }
+            }
+        }
+        else{
+            __android_log_print(ANDROID_LOG_ERROR, "ncnn", "g_cartoon no initialise please load model first");
+            return nullptr;
+        }
+
+    }
 }
+}
+
+

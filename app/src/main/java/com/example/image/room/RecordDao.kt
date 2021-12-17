@@ -3,6 +3,7 @@ package com.example.image.room
 import androidx.paging.PagingSource
 import androidx.room.*
 import com.example.image.model.Record
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RecordDao {
@@ -17,6 +18,8 @@ interface RecordDao {
 
     @Query("SELECT * FROM record order by date desc")
     fun getRecords(): PagingSource<Int, Record>
+    @Query("select count(*) from record")
+    fun getCount():Flow<Int>
 
     @Query("DELETE FROM record")
     suspend fun deleteAll()

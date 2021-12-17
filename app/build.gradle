@@ -36,6 +36,10 @@ android {
             jniDebuggable true
             debuggable true
         }
+        debug {
+            debuggable true
+            jniDebuggable true
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

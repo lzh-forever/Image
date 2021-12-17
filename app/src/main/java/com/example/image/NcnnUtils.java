@@ -18,11 +18,13 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.view.Surface;
 
-public class NcnnBodyseg
+public class NcnnUtils
 {
-    public native boolean loadModel(AssetManager mgr, int modelid, int cpugpu);
+    public native boolean loadModel1(AssetManager mgr, int modelid, int cpugpu);
+    public native boolean loadModel2(AssetManager mgr, int modelid, int cpugpu);
     public native Bitmap matting(Bitmap bitmap);
+    public native Bitmap cartoon(Bitmap bitmap);
     static {
-        System.loadLibrary("ncnnbodyseg");
+        System.loadLibrary("ncnnutils");
     }
 }

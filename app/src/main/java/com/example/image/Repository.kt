@@ -29,6 +29,8 @@ object Repository {
 
     suspend fun deleteRecord(id:Long) = recordDao.deleteRecord(id)
 
+    suspend fun getCount() = recordDao.getCount()
+
 
     fun getPagingData(): Flow<PagingData<Record>> {
         return Pager(

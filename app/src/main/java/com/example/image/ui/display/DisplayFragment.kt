@@ -11,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.image.databinding.FragmentDisplayBinding
 import com.example.image.ui.detail.AddActivity
-import com.example.image.ui.MainActivity
+
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -42,11 +42,6 @@ class DisplayFragment : Fragment() {
         }
 
         binding.addButton.setOnClickListener {
-            val intent = Intent(activity, MainActivity::class.java)
-            startActivity(intent)
-        }
-
-        binding.floatingActionButton2.setOnClickListener {
             val intent = Intent(activity, AddActivity::class.java).apply {
                 putExtra("edit",false)
             }

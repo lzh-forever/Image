@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.image.databinding.ItemBinding
+import com.example.image.databinding.ItemTestBinding
 import com.example.image.model.Record
 import com.example.image.ui.detail.AddActivity
 import java.io.File
@@ -31,33 +33,36 @@ class PhotoAdapter(private val context:Context) : PagingDataAdapter<Record, Phot
         }
     }
 
-    private val map = HashMap<Int,Boolean>()
+//    private val map = HashMap<String,Boolean>()
 
-    class ViewHolder(binding: ItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(binding: ItemTestBinding) : RecyclerView.ViewHolder(binding.root) {
         val content = binding.contentTextView
-        val month = binding.monthTextView
-        val day =binding.dayTextView
+        val date = binding.dateView
         val photo = binding.photoImageView
+
     }
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemTestBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         getItem(position)?.let { record ->
             holder.content.text = record.content
-            val date = record.date.split("-")
-            Log.d("adapter","$date")
-            holder.month.text = date[1]
-            holder.day.text = date[2]
+            holder.date.date =record.date
             record.photoName?.let {
                 Glide.with(context).load(getCachedBitmap(it)).into(holder.photo)
             }
-//            if (position==2){
-//                holder.photo.visibility = View.GONE
-//            }
+//            val year = record.date.split("-")[0]
+//
+//            if (map.get(year) == null){
+//                map.put(year,true)
+//                holder.year.text = year
+//                holder.year.visibility = View.VISIBLE
+//            } else if (map.get(year) == true)
+
             holder.itemView.setOnClickListener {
                 val intent = Intent(context, AddActivity::class.java).apply {
                     putExtra("edit",true)

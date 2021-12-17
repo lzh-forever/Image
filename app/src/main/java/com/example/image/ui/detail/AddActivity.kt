@@ -23,6 +23,8 @@ class AddActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAddBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        supportActionBar?.hide()
+
         viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
         val update = intent.getBooleanExtra("edit", false)

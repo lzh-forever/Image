@@ -11,13 +11,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.example.image.NcnnBodyseg
+import com.example.image.NcnnUtils
 import com.example.image.NcnnCartoon
 import com.example.image.databinding.FragmentProcessBinding
 import com.example.image.util.getBitmapFromUri
 import com.example.image.util.saveBitmapInMedia
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -25,8 +24,7 @@ import kotlinx.coroutines.withContext
 class ProcessFragment : Fragment() {
     lateinit var binding: FragmentProcessBinding
     lateinit var viewModel: ProcessViewModel
-    lateinit var ncnnBodyseg: NcnnBodyseg
-    lateinit var ncnncartoon: NcnnCartoon
+    val ncnnBodyseg = NcnnUtils()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,6 +32,8 @@ class ProcessFragment : Fragment() {
     ): View {
         binding = FragmentProcessBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(ProcessViewModel::class.java)
+        ncnnBodyseg.loadModel1(activity?.assets,0,0)
+        ncnnBodyseg.loadModel2(activity?.assets,0,0)
         viewModel.state.value=viewModel.STATE_TO_LOAD
         binding.floatingActionButton.setOnClickListener {
             albumLauncher.launch("image/*")
@@ -79,11 +79,6 @@ class ProcessFragment : Fragment() {
         binding.process1.setOnClickListener {
             lifecycleScope.launch {
                 withContext(Dispatchers.Default) {
-                    if (!this@ProcessFragment::ncnnBodyseg.isInitialized) {
-                        ncnnBodyseg = NcnnBodyseg().apply {
-                            loadModel(this@ProcessFragment.activity?.assets, 0, 0)
-                        }
-                    }
                     val bitmap = getBitmapFromUri(
                         this@ProcessFragment.activity!!.contentResolver,
                         viewModel.uri!!
@@ -101,16 +96,11 @@ class ProcessFragment : Fragment() {
         binding.process2.setOnClickListener {
             lifecycleScope.launch {
                 withContext(Dispatchers.Default) {
-                    if (!this@ProcessFragment::ncnncartoon.isInitialized) {
-                        ncnncartoon = NcnnCartoon().apply {
-                            loadModel(this@ProcessFragment.activity?.assets, 0, 0)
-                        }
-                    }
                     val bitmap = getBitmapFromUri(
                         this@ProcessFragment.activity!!.contentResolver,
                         viewModel.uri!!
                     )
-                    viewModel.processBitmap = ncnncartoon.cartoon(bitmap)
+                    viewModel.processBitmap = ncnnBodyseg.cartoon(bitmap)
                     withContext(Dispatchers.Main){
                         Glide.with(this@ProcessFragment).load(viewModel.processBitmap).into(binding.image)
                     }

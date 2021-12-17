@@ -9,9 +9,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.example.image.R
+import com.example.image.Repository
 import com.example.image.databinding.FragmentHomeBinding
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlin.concurrent.timerTask
 
 
@@ -32,7 +36,7 @@ class HomeFragment : Fragment() {
     )
     var isScrolling = false
     val handler = Handler(Looper.getMainLooper())
-    val interval = 7000L
+    val interval = 5000L
     val loop = Runnable {
         if(!isScrolling){
             binding.viewPager.setCurrentItem(++viewmodel.curPosition)
@@ -86,6 +90,12 @@ class HomeFragment : Fragment() {
         )
 
         handler.postDelayed(loop,interval)
+
+        lifecycleScope.launch {
+            Repository.getCount().collect { count ->
+                binding.countTextView.text = "共 $count 篇回忆"
+            }
+        }
 
         return binding.root
     }
