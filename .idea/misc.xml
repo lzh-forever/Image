@@ -3,21 +3,21 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="app/src/main/res/drawable/ic_baseline_add_a_photo_24.xml" value="0.3671875" />
-        <entry key="app/src/main/res/drawable/ic_baseline_favorite_border_24.xml" value="0.3671875" />
-        <entry key="app/src/main/res/drawable/ic_baseline_home_24.xml" value="0.3671875" />
-        <entry key="app/src/main/res/layout/activity_add.xml" value="0.25052083333333336" />
+        <entry key="..\:/Learning/Android_WorkSpace/Clone/Image/app/src/main/res/layout/activity_add.xml" value="0.4033613316075515" />
+        <entry key="..\:/Learning/Android_WorkSpace/Clone/Image/app/src/main/res/layout/activity_main.xml" value="0.13854166666666667" />
+        <entry key="..\:/Learning/Android_WorkSpace/Clone/Image/app/src/main/res/layout/activity_main2.xml" value="0.15327730601086959" />
+        <entry key="..\:/Learning/Android_WorkSpace/Clone/Image/app/src/main/res/layout/activity_second.xml" value="0.17346014492753623" />
+        <entry key="..\:/Learning/Android_WorkSpace/Clone/Image/app/src/main/res/layout/fragment_display.xml" value="0.13854166666666667" />
+        <entry key="..\:/Learning/Android_WorkSpace/Clone/Image/app/src/main/res/layout/fragment_home.xml" value="0.13854166666666667" />
+        <entry key="..\:/Learning/Android_WorkSpace/Clone/Image/app/src/main/res/layout/fragment_process.xml" value="0.13854166666666667" />
+        <entry key="..\:/Learning/Android_WorkSpace/Clone/Image/app/src/main/res/layout/home_lr.xml" value="0.20168066580377575" />
+        <entry key="..\:/Learning/Android_WorkSpace/Clone/Image/app/src/main/res/layout/item.xml" value="0.20168066580377575" />
+        <entry key="..\:/Learning/Android_WorkSpace/Clone/Image/app/src/main/res/layout/photo_item.xml" value="0.13854166666666667" />
+        <entry key="..\:/Learning/Android_WorkSpace/Clone/Image/app/src/main/res/layout/process_lr.xml" value="0.13714285274656754" />
+        <entry key="..\:/Learning/Android_WorkSpace/Clone/Image/app/src/main/res/menu/bottom_nav.xml" value="0.16941175927517163" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/activity_main2.xml" value="0.32382246376811596" />
         <entry key="app/src/main/res/layout/activity_second.xml" value="0.35104166666666664" />
-        <entry key="app/src/main/res/layout/fragment_blank.xml" value="0.3179347826086957" />
-        <entry key="app/src/main/res/layout/fragment_display.xml" value="0.3179347826086957" />
-        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.19479166666666667" />
-        <entry key="app/src/main/res/layout/fragment_process.xml" value="0.3179347826086957" />
         <entry key="app/src/main/res/layout/item.xml" value="0.35104166666666664" />
-        <entry key="app/src/main/res/layout/new_item.xml" value="0.32971014492753625" />
-        <entry key="app/src/main/res/layout/photo_item.xml" value="0.19479166666666667" />
-        <entry key="app/src/main/res/menu/bottom_nav.xml" value="0.35104166666666664" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.3671875" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.3671875" />
       </map>
