@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import com.example.image.model.Record
 import kotlinx.coroutines.flow.Flow
-
+//  room dao
 @Dao
 interface RecordDao {
     @Insert

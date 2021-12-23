@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -24,7 +25,7 @@ import kotlinx.coroutines.withContext
 class ProcessFragment : Fragment() {
     lateinit var binding: FragmentProcessBinding
     lateinit var viewModel: ProcessViewModel
-    val ncnnBodyseg = NcnnUtils()
+     val ncnnBodyseg = NcnnUtils()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,8 +33,6 @@ class ProcessFragment : Fragment() {
     ): View {
         binding = FragmentProcessBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(ProcessViewModel::class.java)
-        ncnnBodyseg.loadModel1(activity?.assets,0,0)
-        ncnnBodyseg.loadModel2(activity?.assets,0,0)
         viewModel.state.value=viewModel.STATE_TO_LOAD
         binding.floatingActionButton.setOnClickListener {
             albumLauncher.launch("image/*")
@@ -44,10 +43,13 @@ class ProcessFragment : Fragment() {
                 activity?.let { activity ->
                     viewModel.savedUri = saveBitmapInMedia(bitmap, activity.contentResolver)
                     viewModel.saved = true
+                    Toast.makeText(context,"保存成功",Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
+        // if try to share without having saved the photo
+        // save and share
         binding.shareButton.setOnClickListener {
             if (viewModel.saved){
                 viewModel.savedUri?.let { uri ->
@@ -76,6 +78,7 @@ class ProcessFragment : Fragment() {
             }
         }
 
+        // two kinds of way to process photo
         binding.process1.setOnClickListener {
             lifecycleScope.launch {
                 withContext(Dispatchers.Default) {
@@ -83,6 +86,7 @@ class ProcessFragment : Fragment() {
                         this@ProcessFragment.activity!!.contentResolver,
                         viewModel.uri!!
                     )
+                    ncnnBodyseg.loadModel1(activity?.assets,0,0)
                     viewModel.processBitmap = ncnnBodyseg.matting(bitmap)
                     withContext(Dispatchers.Main){
                         Glide.with(this@ProcessFragment).load(viewModel.processBitmap).into(binding.image)
@@ -100,6 +104,7 @@ class ProcessFragment : Fragment() {
                         this@ProcessFragment.activity!!.contentResolver,
                         viewModel.uri!!
                     )
+                    ncnnBodyseg.loadModel2(activity?.assets,0,0)
                     viewModel.processBitmap = ncnnBodyseg.cartoon(bitmap)
                     withContext(Dispatchers.Main){
                         Glide.with(this@ProcessFragment).load(viewModel.processBitmap).into(binding.image)
@@ -110,6 +115,7 @@ class ProcessFragment : Fragment() {
             }
         }
 
+        // three states -- before load, after load, get the processed to save and share
         viewModel.state.observe(this) { state ->
             Log.d("process","$state")
             when (state) {
@@ -139,12 +145,15 @@ class ProcessFragment : Fragment() {
 
         }
 
-
-
-
         return binding.root
     }
 
+    override fun onDestroyView() {
+        ncnnBodyseg.clear()
+        super.onDestroyView()
+    }
+
+    // select photo
     private val albumLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let {

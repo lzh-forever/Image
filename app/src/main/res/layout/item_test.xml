@@ -2,45 +2,58 @@
 
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:cardCornerRadius="10dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp">
 
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
+
+
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/photoImageView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:maxHeight="500dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:adjustViewBounds="true"
+            app:shapeAppearance="@style/roundedCornerStyle"/>
 
         <com.example.image.view.DateView
             android:id="@+id/dateView"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_margin="8dp"
-            android:layout_gravity="start" />
-
-        <ImageView
-            android:id="@+id/photoImageView"
-            android:layout_width="120dp"
-            android:layout_height="150dp"
-            android:adjustViewBounds="true"
-            android:layout_margin="8dp"
-            android:scaleType="centerCrop" />
-
+            android:layout_marginTop="-25dp"
+            android:padding="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/photoImageView" />
 
         <TextView
             android:id="@+id/contentTextView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:hint="Content"
             android:gravity="center"
-            android:minHeight="70dp"
-            android:textColor="@color/black" />
+            android:hint="Content"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/dateView"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
 
-
-
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
 
 

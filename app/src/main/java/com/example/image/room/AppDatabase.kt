@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.image.model.Record
-
+// single instance room database
 @Database(version = 1, entities = [Record::class])
 abstract class AppDatabase : RoomDatabase() {
     abstract fun recordDao(): RecordDao

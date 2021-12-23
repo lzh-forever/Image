@@ -24,6 +24,7 @@ public class NcnnUtils
     public native boolean loadModel2(AssetManager mgr, int modelid, int cpugpu);
     public native Bitmap matting(Bitmap bitmap);
     public native Bitmap cartoon(Bitmap bitmap);
+    public native void clear();
     static {
         System.loadLibrary("ncnnutils");
     }

@@ -24,6 +24,8 @@ class HomeFragment : Fragment() {
     lateinit var binding: FragmentHomeBinding
     lateinit var viewmodel: HomeViewModel
     lateinit var adapter: ViewPagerAdapter
+    // list of processed photos to display
+    // add to extra to replay
     val list = listOf(
         R.drawable.national_park1,
         R.drawable.china6,
@@ -34,6 +36,7 @@ class HomeFragment : Fragment() {
         R.drawable.national_park1,
         R.drawable.china6
     )
+    // use handler to play the photos with the interval of 5 seconds
     var isScrolling = false
     val handler = Handler(Looper.getMainLooper())
     val interval = 5000L
@@ -55,6 +58,9 @@ class HomeFragment : Fragment() {
         binding.viewPager.adapter = adapter
         Log.d("home","create view")
         binding.viewPager.setCurrentItem(viewmodel.curPosition, false)
+
+        //listen to the viewpager
+        //try send runnable if without operation for 5 seconds
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
                 if (state == ViewPager2.SCROLL_STATE_IDLE) {
@@ -91,6 +97,7 @@ class HomeFragment : Fragment() {
 
         handler.postDelayed(loop,interval)
 
+        //using the flow from room to update the count
         lifecycleScope.launch {
             Repository.getCount().collect { count ->
                 binding.countTextView.text = "共 $count 篇回忆"

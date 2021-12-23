@@ -322,6 +322,15 @@ Java_com_example_image_NcnnUtils_cartoon(JNIEnv *env, jobject thiz, jobject bitm
 
     }
 }
+JNIEXPORT void JNICALL
+Java_com_example_image_NcnnUtils_clear(JNIEnv *env, jobject thiz) {
+    delete g_nanodet;
+    g_nanodet = 0;
+    delete g_cartoondet;
+    g_cartoondet = 0;
 }
+}
+
+
 
 

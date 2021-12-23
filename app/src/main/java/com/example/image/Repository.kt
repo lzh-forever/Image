@@ -31,7 +31,7 @@ object Repository {
 
     suspend fun getCount() = recordDao.getCount()
 
-
+    // paging3 api
     fun getPagingData(): Flow<PagingData<Record>> {
         return Pager(
             config = PagingConfig(PAGE_SIZE),

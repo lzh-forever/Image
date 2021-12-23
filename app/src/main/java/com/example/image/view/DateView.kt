@@ -11,13 +11,14 @@ import android.util.Log
 import androidx.appcompat.widget.AppCompatTextView
 import kotlin.math.max
 
-
+// custom view to display date in the display recyclerView
 class DateView constructor(context: Context, attrs: AttributeSet? =null) : AppCompatTextView(context, attrs) {
 
     private val MONTHS = listOf("Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nov","Dec")
     private val monthPaint: Paint = Paint()
     private val dayPaint: Paint = Paint()
-    private val backgroundPaint: Paint = Paint()
+    private val circlePaint: Paint = Paint()
+    private val backgroundPaint = Paint()
     private val monthRect = Rect()
 
     var space = 10
@@ -25,11 +26,14 @@ class DateView constructor(context: Context, attrs: AttributeSet? =null) : AppCo
     var color:Color? = null
 
 
+
     override fun onDraw(canvas: Canvas) {
         val r = max(width, height) / 2.0f
         val cx = width/2.0f
         val cy = width/2.0f
-        canvas.drawCircle(cx,cy, r, backgroundPaint)
+        val padding = paddingLeft
+        canvas.drawCircle(cx,cy,r,backgroundPaint)
+        canvas.drawCircle(cx,cy, r-padding, circlePaint)
         date?.let { date ->
             val dateArray = date.split("-")
             val month = getMonth(dateArray[1])
@@ -55,8 +59,9 @@ class DateView constructor(context: Context, attrs: AttributeSet? =null) : AppCo
         dayPaint.color = Color.WHITE
         dayPaint.textAlign = Paint.Align.CENTER
 
-        backgroundPaint.color = Color.rgb(0,176,255)
+        circlePaint.color = Color.rgb(0,176,255)
 
+        backgroundPaint.color = Color.WHITE
 
     }
 

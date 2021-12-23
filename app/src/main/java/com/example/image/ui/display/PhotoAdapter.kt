@@ -19,11 +19,11 @@ import java.io.File
 class PhotoAdapter(private val context:Context) : PagingDataAdapter<Record, PhotoAdapter.ViewHolder>(
     COMPARATOR
 ) {
-
+    // used for DiffUtil
     companion object {
         private val COMPARATOR = object : DiffUtil.ItemCallback<Record>() {
             override fun areItemsTheSame(oldItem: Record, newItem: Record): Boolean {
-                return oldItem.id == newItem.id
+                return oldItem.id == newItem.id && oldItem.photoName == newItem.photoName
             }
 
             override fun areContentsTheSame(oldItem: Record, newItem: Record): Boolean {

@@ -1,6 +1,7 @@
 package com.example.image.ui
 
 import android.Manifest
+import android.app.StatusBarManager
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +29,7 @@ class MainActivity2 : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMain2Binding.inflate(layoutInflater)
         setContentView(binding.root)
+        // set up bottom navigation view
         val navView: BottomNavigationView = findViewById(R.id.bottom_navigation)
         val navController = findNavController(R.id.host_fragment)
         navView.setupWithNavController(navController)
@@ -43,7 +45,8 @@ class MainActivity2 : AppCompatActivity() {
             Toast.makeText(this,"permission denied", Toast.LENGTH_SHORT).show()
         }
     }
-
+    // api30 and above, no WRITE_EXTERNAL_STORAGE permission, ask read permission
+    // to use MediaStore apis
     private fun checkAndAskPermission(){
         if(ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
